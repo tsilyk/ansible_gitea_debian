@@ -1,0 +1,67 @@
+---
+# tasks file for deploy_gitea_load_database
+
+- name: Install MariaDB server
+  apt:
+      name:
+          - mariadb-server
+          - python-pymysql
+      state: latest
+
+- name: Start MariaDB server
+  service: name=mariadb state=started enabled=yes
+
+- name: Change the authentication plugin of MySQL root user to mysql_native_password
+  shell: mysql -u root -e 'UPDATE mysql.user SET plugin="mysql_native_password" WHERE user="root" AND host="localhost"'
+
+- name: Flush Privileges
+  shell: mysql -u root -e 'FLUSH PRIVILEGES'
+
+- name: Set MySQL root password
+  mysql_user:
+      #check_implicit_admin: yes
+      login_host: 'localhost'
+      login_user: 'root'
+      login_password: ''
+      host: localhost
+      name: 'root'
+      password: '{{ mysql_root_password }}'
+      state: present
+  ignore_errors: yes    
+
+- name: Create .my.cnf
+  template:
+      src: "client.my.cnf.j2"
+      dest: "{{ dst_file_clientmycnf }}"
+      owner: root
+      group: root
+      mode: 0600
+
+- name: Create Gitea database
+  mysql_db:
+      login_host: 'localhost'
+      login_user: 'root'
+      login_password: '{{ mysql_root_password }}' 
+      #check_implicit_admin: yes
+      name: "{{ mysql_gitea_db }}"
+      encoding: "utf8mb4"
+      state: present
+
+- name: Create user for Gitea
+  mysql_user:
+      user: "{{ mysql_gitea_user }}"
+      password: "{{ mysql_gitea_password }}"
+      host: "%"
+      state: present
+      priv: 'gitea.*:ALL'
+
+- name: Enable external connect to MariaDB
+  lineinfile:
+      dest:  "{{ dst_file_etc_mysnf }}"
+      regexp: "^bind-address"
+      line: "bind-address=0.0.0.0"
+      state: present
+      backup: yes
+  notify:
+      - restart mariadb
+

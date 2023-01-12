@@ -1,0 +1,14 @@
+---
+# defaults file for deploy_gitea_node
+dst_file_gitea: /usr/local/bin/gitea
+dst_file_service: /etc/systemd/system/gitea.service
+dst_file_conf: /etc/gitea/app.ini
+username: git
+usergroup: git
+gitea_db_ip: "{{ hostvars['gitea-database']['ansible_host'] }}"
+gitea_nfs_ip: "{{ hostvars['gitea-storage']['ansible_host'] }}"
+gitea_conf_path_dir: /etc/gitea
+gitea_log_path_dir: /var/lib/gitea/log
+gitea_data_path_dir: /mnt/gitea/data
+gitea_custom_path_dir: /mnt/gitea/custom
+

@@ -1,0 +1,8 @@
+---
+# handlers file for deploy_gitea_storage
+
+- name: restart nfs-server
+  service:
+    name: nfs-server
+    state: restarted
+

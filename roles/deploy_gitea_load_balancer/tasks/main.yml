@@ -1,0 +1,14 @@
+---
+# tasks file for deploy_gitea_load_balancer
+
+- name: Install Packages
+  apt: name=haproxy state=latest
+
+- name: Genereate HAproxy configuration file
+  template: src=haproxy.cfg.j2 dest={{ dst_file_haconf }} mode=0644
+  notify:
+      - restart haproxy
+
+- name: Start HAproxy service
+  service: name=haproxy state=started enabled=yes
+

@@ -1,0 +1,6 @@
+---
+- name: Gitea Basic Setup
+  hosts: gitea
+  roles:
+      - { role: basic_setup, when: ansible_system == 'Linux' }
+

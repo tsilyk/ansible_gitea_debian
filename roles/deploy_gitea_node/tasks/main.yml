@@ -1,0 +1,75 @@
+---
+# tasks file for deploy_gitea_node
+- name: Install Packages
+  apt:
+      name:
+          - nfs-common
+          - rpcbind
+          - git
+      state: latest
+
+- name: Add config for mount NFS
+  lineinfile:
+      path: /etc/fstab
+      line: "{{  gitea_nfs_ip }}:/srv   /mnt   nfs   rw,async       0 0"
+      create: yes
+
+- name: Mount an NFS volume
+  mount:
+      src: "{{ gitea_nfs_ip }}:/srv"
+      path: /mnt
+      opts: rw,async
+      state: mounted
+      fstype: nfs
+
+- name: Create group git
+  group:
+      name: "{{ usergroup }}"
+      gid: 115
+      system: yes
+      state: present
+
+- name: Create User
+  user:
+      uid: 115
+      name: "{{ username }}"
+      group: "{{ usergroup }}"
+      system: yes
+      state: present
+      comment: Git Version Control
+      create_home: yes
+      shell: /bin/bash
+      password: !
+      append: no
+
+- name: Create Gitea config directory
+  file:
+      path: "{{ gitea_conf_path_dir }}"
+      state: directory
+      group: "{{ usergroup }}"
+      mode: 0750
+
+- name: Create work directorys
+  file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ username }}"
+      group: "{{ usergroup }}"
+      mode: 0750
+  with_items:
+      - "{{ gitea_log_path_dir }}"
+      - "{{ gitea_data_path_dir }}"
+      - "{{ gitea_custom_path_dir }}"
+
+- name: Genereate Gitea configuration file
+  template: src=app.ini.j2 dest={{ dst_file_conf }} group={{ usergroup }} mode=0640
+
+- name: Copy Gitea binary file for first run
+  copy: src=gitea dest={{ dst_file_gitea }} mode=0755
+
+- name: Copy Gitea service file
+  copy: src=gitea.service dest={{ dst_file_service }} mode=0644
+
+- name: Start Gitea service
+  service: name=gitea state=started enabled=yes
+

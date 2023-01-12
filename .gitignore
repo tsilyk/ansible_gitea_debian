@@ -1,0 +1,8 @@
+# Ignore this
+
+playbooks
+playbooks/*
+
+
+roles/deploy_gitea_node/files/gitea
+

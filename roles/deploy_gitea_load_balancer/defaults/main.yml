@@ -1,0 +1,6 @@
+---
+# defaults file for deploy_gitea_load_balancer
+
+dst_file_haconf: /etc/haproxy/haproxy.cfg
+
+

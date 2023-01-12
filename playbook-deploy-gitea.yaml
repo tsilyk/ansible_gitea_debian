@@ -1,0 +1,20 @@
+---
+- name: Gitea Database
+  hosts: db
+  roles:
+      - { role: deploy_gitea_database, when: ansible_system == 'Linux' }
+
+- name: Gitea Storage
+  hosts: storage
+  roles:
+      - { role: deploy_gitea_storage, when: ansible_system == 'Linux' }
+
+- name: Gitea Nodes
+  hosts: prod
+  roles:
+      - { role: deploy_gitea_node, when: ansible_system == 'Linux' }
+
+- name: Gitea Load Balancer
+  hosts: load_balancer
+  roles:
+      - { role: deploy_gitea_load_balancer, when: ansible_system == 'Linux' }

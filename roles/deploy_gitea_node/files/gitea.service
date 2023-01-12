@@ -1,0 +1,19 @@
+[Unit]
+Description=Gitea
+After=syslog.target
+After=network.target
+
+[Service]
+LimitMEMLOCK=infinity
+LimitNOFILE=4000
+RestartSec=2s
+Type=simple
+User=git
+Group=git
+WorkingDirectory=/mnt/gitea/
+ExecStart=/usr/local/bin/gitea web --config /etc/gitea/app.ini
+Restart=always
+Environment=USER=git HOME=/home/git GITEA_WORK_DIR=/mnt/gitea
+
+[Install]
+WantedBy=multi-user.target

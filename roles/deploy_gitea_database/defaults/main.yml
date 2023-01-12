@@ -1,0 +1,10 @@
+---
+# defaults file for deploy_gitea_load_database
+
+mysql_root_password: "ssadmin"
+mysql_gitea_db: "gitea"
+mysql_gitea_user: "gitea"
+mysql_gitea_password: "gitea1"
+dst_file_clientmycnf: /root/.my.cnf
+dst_file_etc_mysnf: /etc/mysql/mariadb.conf.d/50-server.cnf
+

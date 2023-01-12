@@ -1,0 +1,24 @@
+---
+# tasks file for deploy_gitea_storage
+
+- debug: var=ansible_default_ipv4.address
+- debug: var=ansible_host
+
+- name: Install NFS server
+  apt:
+      name:
+          - nfs-kernel-server
+          - rpcbind
+      state: latest
+
+- name: Start NFS server
+  service: name=nfs-server state=started enabled=yes
+
+- name: Add config for NFS server
+  lineinfile:
+      path: /etc/exports
+      line: "/srv    *(rw,async,no_subtree_check,insecure,no_root_squash)"
+      create: yes
+  notify:
+      - restart nfs-server
+

@@ -1,0 +1,7 @@
+---
+# defaults file for basic_setup
+username: ssa
+userpass: ssadmin
+zabbix_agent_dist: /tmp/zabbix-release_5.0-1+buster_all.deb
+dst_zabbix_agent_conf: /etc/zabbix/zabbix_agentd.d/zabbix_agent_host.conf
+

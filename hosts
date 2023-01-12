@@ -1,0 +1,27 @@
+[db]
+gitea-database        ansible_host=192.168.5.24
+ 
+[storage]
+gitea-storage       ansible_host=192.168.5.33
+ 
+[load_balancer]
+gitea-load-balancer        ansible_host=192.168.5.36
+
+[staging]
+gitea-01        ansible_host=192.168.5.37
+ 
+[prod]
+gitea-02        ansible_host=192.168.5.39
+gitea-03        ansible_host=192.168.5.40
+
+[gitea:children]
+prod
+db
+storage
+load_balancer
+staging
+
+[gitea:vars]
+ansible_user = root
+super_group = sudo
+ansible_sudo_pass=ssadmin

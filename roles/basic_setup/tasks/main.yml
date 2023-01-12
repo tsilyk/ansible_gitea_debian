@@ -1,0 +1,62 @@
+---
+# tasks file for basic_setup
+
+- name: Print inventory hostname
+  debug:
+      var: inventory_hostname
+
+- name: Allow release-info to change for APT repositories
+  command: apt update -y --allow-releaseinfo-change
+
+- name: Upgrade all packages
+  apt:
+      upgrade: yes
+      #name: '*'
+      #state: latest
+
+- name: Create User
+  user:
+      name: "{{ username }}"
+      state: present
+      shell: /bin/bash
+      password: "{{ userpass | password_hash('sha512') }}"
+      update_password: on_create
+      groups: "{{ super_group }}"
+      append: yes
+
+- name: Deploy SSH Public Key
+  authorized_key:
+      user: "{{ username }}"
+      state: present
+      key: "{{ lookup('file', '~/.ssh/ssa.pub') }}"
+
+- name: Copy Zabbix agent distrib
+  copy: src=zabbix-release_5.0-1+buster_all.deb dest={{ zabbix_agent_dist }} mode=0644
+
+- name: Install Zabbix .deb package
+  apt:
+      deb: "{{ zabbix_agent_dist }}"
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+      update_cache: yes
+      cache_valid_time: 3600
+
+- name: Install Basic soft
+  apt:
+      name:
+          - sudo
+          - python
+          - zabbix-agent
+      update_cache: yes
+      state: latest
+
+- name: Genereate Zabbix configuration file
+  template: src=zabbix_agent_host.conf.j2 dest={{ dst_zabbix_agent_conf }} mode=0644
+  notify:
+      - restart zabbix-agent
+
+- name: Start Zabbix Agent service
+  service: name=zabbix-agent state=started enabled=yes
+
+
