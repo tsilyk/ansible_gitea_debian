@@ -1,0 +1,38 @@
+---
+- name: Deploy Gitea Artifact
+  hosts: prod
+  serial: 1
+  become: yes
+
+  vars:
+      dst_dir_gitea: /usr/local/bin/
+      src_dir_gitea:  /var/gitea/
+
+  vars_prompt:
+      - name: gitea_build_num
+        prompt: What is number of build for Gitea your want update?
+        private: false
+                               
+  tasks:
+      - name: Deploing file
+        debug:
+            msg: "Source file: {{ src_dir_gitea }}gitea.build{{ gitea_build_num }}.tgz"
+
+      - name: Stop service gitea for update
+        service:
+            name: gitea
+            state: stopped
+
+      - name: Extract gitea.build*.tgz into /usr/local/bin/gitea
+        unarchive:
+            src: "{{ src_dir_gitea }}gitea.build{{ gitea_build_num }}.tgz"
+            dest: "{{ dst_dir_gitea }}" 
+
+      - name: Start service gitea after update
+        service:
+            name: gitea
+            state: started
+
+      - name: Pause for 5 second to load-balancer
+        pause:
+            seconds: 5
