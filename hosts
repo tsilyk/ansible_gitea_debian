@@ -13,6 +13,7 @@ gitea-01        ansible_host=192.168.5.37
 [prod]
 gitea-02        ansible_host=192.168.5.39
 gitea-03        ansible_host=192.168.5.40
+gitea-04        ansible_host=192.168.5.41
 
 [gitea:children]
 prod

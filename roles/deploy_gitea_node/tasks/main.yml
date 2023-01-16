@@ -25,13 +25,13 @@
 - name: Create group git
   group:
       name: "{{ usergroup }}"
-      gid: 115
+      gid: 120
       system: yes
       state: present
 
 - name: Create User
   user:
-      uid: 115
+      uid: 120
       name: "{{ username }}"
       group: "{{ usergroup }}"
       system: yes
@@ -64,8 +64,12 @@
 - name: Genereate Gitea configuration file
   template: src=app.ini.j2 dest={{ dst_file_conf }} group={{ usergroup }} mode=0640
 
-- name: Copy Gitea binary file for first run
-  copy: src=gitea dest={{ dst_file_gitea }} mode=0755
+- name: Extract Last released version og Gitea into /usr/local/bin/gitea
+  unarchive:
+      src: "{{ src_dir_gitea }}gitea.buildlastversion.tgz"
+      dest: "{{ dst_dir_gitea }}"
+      owner: root
+      group: root
 
 - name: Copy Gitea service file
   copy: src=gitea.service dest={{ dst_file_service }} mode=0644

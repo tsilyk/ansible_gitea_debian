@@ -41,7 +41,7 @@ frontend myfrontend
     default_backend myservers
 
 backend myservers
-{% for host in groups['staging'] %}
+{% for host in groups['prod'] %}
     server {{ host }} {{ hostvars[host]['ansible_host'] }}:3000
 {% endfor %}
 
@@ -58,7 +58,7 @@ frontend ssh
 # SSH server proxy
 backend ssh.backend
     mode tcp
-{% for host in groups['staging'] %}
+{% for host in groups['prod'] %}
     server {{ host }}-ssh {{ hostvars[host]['ansible_host'] }}:22
 {% endfor %}
 
